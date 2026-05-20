@@ -432,7 +432,7 @@ This regional + register decision is encoded as defaults in `engine/dialect/lexi
 | جيد | ممتاز / طيب | "good" — `زين` tagged casual; not used by default |
 | لا بأس | ما في مشكلة / تكفون لا تشلون هم | "no problem" — respectful forms |
 | مرحبا | حياكم الله / مرحبا / تفضلوا | greetings; plural-of-respect default; `هلا` tagged casual |
-| من فضلك | لو تكرم / لو سمحت / إذا ممكن | "please" — `لو تكرم` is more respectful |
+| من فضلك | لو سمحت / إذا ممكن | "please" — **لو تكرم rejected by user 2026-05-20** (banned-token) |
 | شكرا | مشكورين / يعطيكم العافية | "thanks" — plural-of-respect; `يعطيكم العافية` high register |
 | (you're welcome) | العفو / تحت أمركم | service-context closes |
 | (at your service) | في خدمتكم / تحت أمركم | signature respect-phrases |
@@ -903,7 +903,7 @@ Implementation is complete when **all** of these are demonstrably true:
 10. **The `generic_demo` business is a generic small-services company** (think: a small services firm with appointments, hours, FAQs, escalations). Confirmed by user 2026-05-20.
 11. **Gemini is the only live LLM provider for v1.** Claude/OpenAI adapters are written and unit-tested but no live key is required. **Cost cap $5 USD** total. Confirmed by user 2026-05-20.
 12. **Region pinned to Muscat / Sahili Omani; register: official-respectful.** Confirmed by user 2026-05-20.
-13. **Git + GitHub collaboration is required.** Two-developer flow (Basil + friend), feature-branch + PR workflow. Repo to be created on GitHub by user (gh CLI not installed locally); local repo initialized at planning end.
+13. **Git + GitHub collaboration is required.** Two-developer flow (Basil + friend), feature-branch + PR workflow. **GitHub repo `basilalshukaili/omani-reception` will be created public via `gh` CLI** (gh v2.92.0 confirmed installed and authenticated 2026-05-20 with `repo` + `workflow` + `gist` + `read:org` scopes). Local repo initialized at planning end.
 
 ---
 
@@ -932,7 +932,7 @@ Before I spawn the implementation swarm, please confirm or amend:
 - **Telegram bot identity verified:** `@techmate_reception_bot` ("Receptionist"), token validated via `getMe`.
 - **Admin chat_id captured:** Basil — `880315854`. Will be wired into `.env` as `TELEGRAM_ADMIN_CHAT_ID` for `/teach` command authorization.
 - **Native-speaker reviewer secured:** Basil. R1 mitigation upgraded (§15).
-- **Lexicon corrections received (4):** ويش / ايوا / كيف الحال / كيف اقدر اخدمك. Captured in §6.3 and persisted to long-term memory under `C:\Users\basil\.claude\projects\C--Users-basil-Share-reception\memory\`.
+- **Lexicon corrections received (5):** ويش / ايوا / كيف الحال / كيف اقدر اخدمك (initial 4) + **لو تكرم rejected** (added 2026-05-20). Captured in §6.3 and persisted to long-term memory under `C:\Users\basil\.claude\projects\C--Users-basil-Share-reception\memory\`.
 - **Response-length rule received:** "do not flood the user with a huge reply for a small conversation; depend on context." Encoded in §6.8 + §10 `persona.response_style`.
 - **Live teaching loop confirmed:** user will run a simulated conversation post-implementation. `/teach` command and `scripts/apply_corrections.py` are first-class deliverables (§6.9).
 - **LLM scope locked:** Gemini-only live for v1 (Flash for turns, Pro for eval). $5 USD total spend cap. Embeddings switched to `text-embedding-004` (free).
@@ -941,7 +941,8 @@ Before I spawn the implementation swarm, please confirm or amend:
 - **Production hosting:** agnostic Docker; runbook covers any host (confirmed default).
 - **Autonomy mode:** P0→P7 autonomous with phase-end check-ins (confirmed default).
 - **Collaboration:** Git + GitHub, feature-branch + PR flow, two developers (Basil + friend, non-concurrent). See §20.
-- **Tooling gap surfaced:** `gh` CLI not installed locally. User will create GitHub repo via web UI OR install gh (`winget install GitHub.cli`); local repo will be initialized at planning end.
+- **`gh` CLI confirmed installed and authenticated** (v2.92.0, account `basilalshukaili`, scopes: `repo, workflow, gist, read:org`). Binary at `C:\Program Files\GitHub CLI\gh.exe` — not yet on this shell's PATH so I'll invoke via full path until a fresh terminal is started.
+- **GitHub repo decision:** **PUBLIC**, named `omani-reception`, owner `basilalshukaili`. Decided 2026-05-20.
 
 ---
 
@@ -975,22 +976,7 @@ Two developers (Basil + friend) collaborate, **non-concurrent** by agreement. Ev
 
 Two options:
 
-**Option A — Web UI (no extra install):**
-1. Go to https://github.com/new
-2. Repo name: `omani-reception` (suggested; anything works)
-3. Private (recommended) — code references API keys via env vars but commit history is safer private
-4. Do NOT initialize with README/license/.gitignore (we have our own)
-5. After creation, copy the SSH or HTTPS URL
-6. Run locally:
-   ```powershell
-   git remote add origin git@github.com:<you>/omani-reception.git
-   git branch -M main
-   git push -u origin main
-   ```
-
-**Option B — gh CLI:**
-1. `winget install GitHub.cli` then `gh auth login` (web-based browser flow)
-2. From the repo: `gh repo create omani-reception --private --source=. --remote=origin --push`
+**Done 2026-05-20 via gh CLI:** `gh repo create omani-reception --public --source=. --remote=origin --push` — repo lives at `https://github.com/basilalshukaili/omani-reception` (public). Collaborator (your friend) added by you separately via Settings → Collaborators.
 
 ### 20.3 Friend's onboarding
 
