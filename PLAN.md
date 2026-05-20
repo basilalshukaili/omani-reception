@@ -419,18 +419,18 @@ This regional + register decision is encoded as defaults in `engine/dialect/lexi
 
 | MSA / English | Omani | Notes |
 |---|---|---|
-| ماذا / "what" | **ويش** ✅ | user-confirmed; **شو / إيش rejected** (added to banned-tokens list) |
-| نعم / "yes" | **ايوا** ✅ | user-confirmed; **إيه / هاء rejected** (added to banned-tokens list) |
-| "how are you" | **كيف الحال** ✅ | single canonical Omani form; **كيف (alone) / شخبارك dropped** per user |
-| "how can I help you" (service register) | **كيف اقدر اخدمك** ✅ | service-oriented form; **شو تبي / شو تبغى rejected** per user — appropriate for a receptionist who is *serving*, not interrogating |
+| ماذا / "what" | **ويش**  | user-confirmed; **شو / إيش rejected** (added to banned-tokens list) |
+| نعم / "yes" | **ايوا**  | user-confirmed; **إيه / هاء rejected** (added to banned-tokens list) |
+| "how are you" | **كيف الحال**| single canonical Omani form; **كيف (alone) / شخبارك dropped** per user |
+| "how can I help you" (service register) | **كيف اقدر اخدمك** | service-oriented form; **شو تبي / شو تبغى rejected** per user — appropriate for a receptionist who is *serving*, not interrogating |
 | أين | وين | "where" |
 | الآن | الحين | "now" |
 | لا | لا (same) | — |
 | لماذا | ليش | "why" |
 | متى | متى (same in Omani) | — |
-| كثير | كثير / وايد (casual only) | "a lot/very" — prefer `كثير` in official register |
+| كثير |  واجد (casual only) | "a lot/very" — prefer `كثير` in official register |
 | جيد | ممتاز / طيب | "good" — `زين` tagged casual; not used by default |
-| لا بأس | ما في مشكلة / تكفون لا تشلون هم | "no problem" — respectful forms |
+| لا بأس | ما مشكلة | "no problem" — respectful forms |
 | مرحبا | حياكم الله / مرحبا / تفضلوا | greetings; plural-of-respect default; `هلا` tagged casual |
 | من فضلك | لو سمحت / إذا ممكن | "please" — **لو تكرم rejected by user 2026-05-20** (banned-token) |
 | شكرا | مشكورين / يعطيكم العافية | "thanks" — plural-of-respect; `يعطيكم العافية` high register |
