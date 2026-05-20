@@ -2,7 +2,9 @@
 
 A production-quality, chat-only AI receptionist that converses in authentic **Omani Khaleeji Arabic** (Muscat / Sahili variety, official-respectful register) over Telegram. Designed as a **general scaffold**: a new business is onboarded by editing config + dropping a folder of knowledge, with **zero engine code changes**.
 
-> **Status:** In planning. See [PLAN.md](PLAN.md) for the full architecture, methodology, and acceptance criteria. Implementation begins after sign-off.
+> **For Claude Code (or any AI assistant) resuming this project on a new machine:** read [HANDOFF.md](HANDOFF.md) first. It carries the full resume context — current phase, user preferences, lexicon authoritative reference, and the next concrete step.
+
+> **Status:** P0 (Foundation & Conventions) complete. See [PLAN.md](PLAN.md) for the full architecture, [docs/phase_reports/phase_0.md](docs/phase_reports/phase_0.md) for what's shipped, and [HANDOFF.md](HANDOFF.md) for resume instructions.
 
 ## High-level
 

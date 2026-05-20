@@ -1,0 +1,5 @@
+# Code owners for omani-reception.
+# Each line: <pattern> <owner...>. Last matching pattern wins.
+# TODO: add @<friend-handle> when friend joins as collaborator.
+
+* @basilalshukaili
