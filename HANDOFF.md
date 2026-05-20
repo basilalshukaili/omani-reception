@@ -18,7 +18,7 @@ Repo: **https://github.com/basilalshukaili/omani-reception** (public)
 ## The hard constraints (do not violate)
 
 1. **Cost cap: $5 USD total** for the entire build. Gemini's free tier covers most. Track every paid call in `engine/observability/cost_tracker.py` (lands in P6). Warn at $3, hard-stop at $5.
-2. **Gemini is the only live LLM provider for v1.** Claude/OpenAI adapters are written and unit-tested with mocked HTTP, but no live key is required. Default model: `gemini-1.5-flash` for normal turns, `gemini-1.5-pro` for evaluation/judge calls.
+2. **Gemini is the only live LLM provider for v1.** Claude/OpenAI adapters are written and unit-tested with mocked HTTP, but no live key is required. Default model: `gemini-2.5-flash` for normal turns, `gemini-2.5-pro` for evaluation/judge calls.
 3. **Embeddings: Google `text-embedding-004`** (free in Gemini tier). Adapters for OpenAI/Cohere preserved but not exercised live.
 4. **Region: Muscat / coastal Sahili Omani only.** Don't mix regions (don't slip in Dhofari/interior/Musandam phrasings). Per-business override is available via `dialect.region` but `generic_demo` is Muscat.
 5. **Register: official-respectful.** Plural-of-respect (`حياكم`, `تفضلوا`, `كيف اقدر اخدمكم`) is the default address form. No street slang. No casual filler. Receptionist speaks like a polite professional, not a friend at a majlis.
@@ -50,30 +50,48 @@ Repo: **https://github.com/basilalshukaili/omani-reception** (public)
 
 ## Current state — as of 2026-05-20
 
-**Phase P0 — Foundation & Conventions: ✅ DONE** (or pending PR #1 merge — verify on GitHub).
+**Phases done so far:**
+- **P0 — Foundation & Conventions:** ✅ DONE. PR #1 (`feat(p0): foundation & conventions`).
+- **P1 — LLM Adapter & Chat Loop:** ✅ DONE on PC1, live Omani greeting from Gemini 2.5-flash verified. PR #2 (`feat(p1): LLM adapter + Telegram + orchestrator`).
 
-Verified locally on the original dev machine:
+PR status on GitHub: check `https://github.com/basilalshukaili/omani-reception/pulls` — Basil typically reviews each PR before merging.
+
+**P1 gate evidence** — `python scripts/smoke_test_p1.py` produced:
+```
+وعليكم السلام ورحمة الله وبركاته، حياكم الله في شركة الواحة للخدمات،
+معاكم سارة موظفة الاستقبال. كيف اقدر اخدمكم؟
+```
+Authentic Muscat-style Omani, plural-of-respect, no banned tokens. ~$0.001 spent.
+
+**Verified gates on PC1:**
+- `pytest -m unit` → **166/166 passed in 9.46s**
+- `ruff check` / `ruff format --check` → clean (48 files)
+- `mypy engine` → 0 issues in 30 source files
 - `python -m engine.cli --version` → `reception, version 0.1.0`
-- `python -m engine.cli health --business generic_demo` → exit 0, prints Arabic persona name correctly
-- `pytest -m unit` → 20/20 passed in 0.27s
-- `ruff check engine tests` → clean
-- `ruff format --check engine tests` → clean
-- `mypy engine` → 0 issues across 19 files
-- `docker-compose.yml` → structurally valid (`python scripts/verify_compose.py`)
+- `python -m engine.cli health --business generic_demo` → exit 0
+- `python -m engine.cli chat --help` → shows `--no-telegram` flag
+- Live Gemini 2.5-flash smoke test → PASS
 
-**Deferred:** full `docker compose up` boot — Docker Desktop was not installed on the original dev machine. **You should be on the Docker-enabled machine now; verify with `docker --version && docker compose version`.**
+**Deferred (pending Docker on PC2):**
+- Full `docker compose up` boot (Postgres+pgvector+Redis live)
+- Live Telegram polling round-trip — Basil sends `/start` to `@techmate_reception_bot`, bot responds via real polling loop
+- Redis-backed session (currently in-memory; lands in P2)
 
-PR #1: `https://github.com/basilalshukaili/omani-reception/pull/1` (titled `feat(p0): foundation & conventions`).
+**Cost-to-date: ~$0.001 of $5.00.**
 
-## What to do first when you resume
+## What to do first when you resume on PC2
 
 ```powershell
-# 1. Confirm you're on the right machine
+# 1. Confirm you're on the Docker-enabled machine
 docker --version
 docker compose version
 
-# 2. Pull latest from GitHub (may include the merged P0 PR)
+# 2. Pull latest from GitHub (P0 + P1 should be there, possibly merged into main)
 git pull --rebase origin main
+
+# If PRs aren't merged yet, fetch and check out the latest feature branch:
+#   git fetch origin
+#   git checkout feat/p1-llm-adapter  (or main if merged)
 
 # 3. Set up the local env (one-time per machine)
 python -m venv .venv
@@ -82,46 +100,60 @@ pip install -e ".[dev]"
 
 # 4. Copy the env template and fill in real values
 copy .env.example .env
-# Then edit .env — at minimum set:
-#   TELEGRAM_BOT_TOKEN  (already created: @techmate_reception_bot — Basil has the token)
-#   GEMINI_API_KEY      (Basil has this)
-#   TELEGRAM_ADMIN_CHAT_ID=880315854   (already in .env.example default — keep)
+# Basil's keys (already used on PC1, copy verbatim):
+#   TELEGRAM_BOT_TOKEN=8919867594:AAE8sqTILla2SkNKf38UdIn8uxRYbdwquMw
+#   TELEGRAM_ADMIN_CHAT_ID=880315854
+#   GEMINI_API_KEY=AIzaSyBZW3HiYSwnohs4G7-Ng46dqFhzMWSRxxI
+# Bot: @techmate_reception_bot, chat_id 880315854 for /teach admin access.
 
-# 5. Verify the existing P0 baseline
+# 5. Verify the existing P0 + P1 baseline
 python -m engine.cli --version            # → reception, version 0.1.0
 python -m engine.cli health --business generic_demo
-pytest -m unit                             # → 20 passed
+pytest -m unit                             # → 166 passed
 ruff check engine tests
 mypy engine
-docker compose config                      # → should print resolved YAML; if errors, debug
+python scripts/smoke_test_p1.py            # → live Gemini Omani greeting (PASS)
+
+# 6. Bring up Docker stack (the big new thing on PC2)
+docker compose up -d
+docker compose ps                          # postgres + redis healthy
+docker compose logs postgres | tail -20    # confirm pgvector + pg_trgm extensions ran
 ```
 
-If all green, you're ready for **P1**.
+If all green, you're ready for **P2**.
 
-## Next phase — P1: LLM Adapter & Chat Loop
+To LIVE-test the Telegram bot (any time after the above):
+```powershell
+python -m engine.cli chat --business generic_demo
+# Then on Basil's Telegram: send /start to @techmate_reception_bot
+# Bot replies with an Omani greeting. Ctrl-C to stop the bot.
+```
+
+## Next phase — P2: Memory & RAG
 
 **Scope (from PLAN.md §13):**
-- `LLMProvider` abstract base class in `engine/llm/base.py` + concrete adapters:
-  - `engine/llm/gemini.py` — **live**, uses `google-genai` SDK
-  - `engine/llm/claude.py` — **mocked-tested**, uses `anthropic` SDK
-  - `engine/llm/openai.py` — **mocked-tested**, uses `openai` SDK
-  - `engine/llm/factory.py` — picks provider from config / env override
-  - `engine/llm/normalize.py` — unifies tool-call schemas across providers
-- `engine/channels/base.py` — `Channel` ABC (works for Telegram now, voice later)
-- `engine/channels/telegram.py` — long-polling adapter (use `python-telegram-bot` v21)
-- `engine/core/orchestrator.py` — turn-by-turn loop: receive → call LLM with bare system prompt → reply
-- Wire `/start` to a configurable Omani greeting from `businesses/generic_demo/config.yaml.persona.signature_open` (add this field to schema if not present — see deferred items below)
-- ADR-0002 (LLM abstraction), ADR-0006 (channel abstraction)
+- **Replace `InMemorySessionStore` with `RedisSession`** behind the same interface
+- **Postgres `kb_chunk` table** (the real schema, replacing the P0 stub in `infra/postgres/init.sql`)
+- **Arabic normalizer** in `engine/rag/arabic_normalizer.py` — tashkeel removal, alef variants (ا/أ/إ/آ → ا), yaa variants (ي/ى → ي), taa marbuta (ة/ه), tatweel, light stemming via CAMeL Tools
+- **Hybrid retriever** in `engine/rag/retriever.py` — BM25 via Postgres tsvector + dense via pgvector + RRF fusion (k=60), top-K from config
+- **Embedding adapter** — Gemini `text-embedding-004` (free in tier)
+- **Ingest script** in `scripts/ingest.py` — walks `businesses/<biz>/knowledge/`, chunks (~400 tokens, 60 overlap), embeds, persists to `kb_chunk`
+- **Rolling summarization** in `engine/memory/summarizer.py` — when session exceeds `summarize_after_turns`, compress oldest half into Arabic summary
+- **Long-term memory** `engine/memory/long_term.py` — `customer_memory(chat_id, business_id, fact_text, fact_embedding, source, created_at)` retrieval at turn start
+- **Orchestrator hookup** — retrieve KB context + long-term facts + style retrieval (P4 will add this last one); inject into system prompt
+- **Add `tools_file` / `phrase_dir` / `examples_file` / `knowledge_dir` to BusinessConfig schema** (deferred from P0)
+- ADR-0003 (pgvector), ADR-0004 (arabic retrieval strategy)
 
-**Gate:** `/start` on Telegram returns an Omani greeting via Gemini. Same code works with `LLM_PROVIDER=claude` and `LLM_PROVIDER=openai` env override (mocked in tests; gracefully fails with a clear "no API key" message live if no key is provided).
+**Gate:** bot answers ≥5 questions from a seeded `generic_demo` knowledge base correctly, in Omani Arabic. Memory persists across two messages in one conversation. Long-term memory recalls a fact from a prior session.
 
-**Estimated cost:** under $0.10 for testing (Gemini Flash is cheap).
+**Estimated cost:** ~$0.05 (Gemini Flash + free text-embedding-004 calls).
 
 **Workflow:**
-1. `git checkout -b feat/p1-llm-adapter`
-2. Use the `Agent` tool with `general-purpose` sub-agents in parallel for: LLM adapters, Channel adapter, Orchestrator, Tests. Coordinate via `TaskCreate`.
-3. Verify gate yourself: `pytest`, then manually `/start` to the Telegram bot.
-4. Open PR #2, write `docs/phase_reports/phase_1.md`, wait for Basil's review.
+1. `git checkout -b feat/p2-memory-rag` (off latest `main` after PR #2 merges)
+2. Use parallel sub-agents for: ingest pipeline, retriever, Arabic normalizer, Redis session, long-term memory, ADRs, tests
+3. **Seed `businesses/generic_demo/knowledge/`** with 4-6 short markdown files (services, hours, pricing, location, FAQs, policies) — Basil can author these in Arabic before P2 starts, or Claude can draft and Basil corrects
+4. Verify gate: real questions through Telegram → grounded answers
+5. Open PR #3, write `docs/phase_reports/phase_2.md`
 
 ## Pending items / open questions (read before starting P1)
 
@@ -150,7 +182,7 @@ If all green, you're ready for **P1**.
 2. Provider-agnostic LLM proven via config swap
 3. Telegram round-trip for ≥10 representative customer questions in Omani
 4. Function calling proven (`book_appointment` stub end-to-end)
-5. Dialect golden set ≥90% on `gemini-1.5-flash`
+5. Dialect golden set ≥90% on `gemini-2.5-flash`
 6. Memory works (in-conversation + across-session)
 7. Security red-team passes 100%
 8. Observability: log + trace + cost ledger for every conversation

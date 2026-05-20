@@ -69,7 +69,7 @@ _MIN_VALID_YAML = textwrap.dedent(
 
     llm:
       provider: gemini
-      model: gemini-1.5-flash
+      model: gemini-2.5-flash
     """
 )
 
@@ -97,7 +97,7 @@ _INVALID_YAML = textwrap.dedent(
 
     llm:
       provider: gemini
-      model: gemini-1.5-flash
+      model: gemini-2.5-flash
     """
 )
 

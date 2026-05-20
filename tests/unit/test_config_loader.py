@@ -100,7 +100,7 @@ def test_business_id_slug_enforced(tmp_business_dir: Path, bad_id: str) -> None:
 
         llm:
           provider: gemini
-          model: gemini-1.5-flash
+          model: gemini-2.5-flash
         """
     )
     (tmp_business_dir / "config.yaml").write_text(cfg_text, encoding="utf-8")
@@ -140,7 +140,7 @@ def test_env_var_interpolation_resolves(
 
         llm:
           provider: gemini
-          model: gemini-1.5-flash
+          model: gemini-2.5-flash
 
         channels:
           telegram:

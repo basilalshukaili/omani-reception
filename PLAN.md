@@ -305,7 +305,7 @@ The factory reads `config.llm.provider` (`gemini` | `claude` | `openai`) and `co
 
 **Tool-call schema normalization:** Gemini, Claude, and OpenAI all support function calling but their schemas differ. Our `normalize.py` translates a canonical `ToolSchema` (Pydantic) into each provider's native format on the way in, and translates tool-call responses back into a canonical `ToolCall` on the way out. Adapter layer eats the difference — orchestrator code is provider-blind.
 
-**Default & only live provider for v1:** `gemini-1.5-flash` for normal turns, `gemini-1.5-pro` for the dialect evaluation runs (P4) and any quality-sensitive paths the user opts into. **Cost cap is $5 USD total** for the entire build; Gemini's free tier covers most of this. Claude and OpenAI adapters are written and exercised in unit tests with mocked HTTP, but no live API key is required for the build. They become live-tested only if/when the user provides keys.
+**Default & only live provider for v1:** `gemini-2.5-flash` for normal turns, `gemini-2.5-pro` for the dialect evaluation runs (P4) and any quality-sensitive paths the user opts into. **Cost cap is $5 USD total** for the entire build; Gemini's free tier covers most of this. Claude and OpenAI adapters are written and exercised in unit tests with mocked HTTP, but no live API key is required for the build. They become live-tested only if/when the user provides keys.
 
 The P4 A/B is **within the Gemini family** (Flash vs Pro) instead of across providers — Flash for cost, Pro for quality benchmarks. Cross-provider A/B is deferred until budget or keys allow.
 
@@ -641,7 +641,7 @@ persona:
 
 llm:
   provider: gemini             # gemini | claude | openai
-  model: gemini-1.5-flash
+  model: gemini-2.5-flash
   temperature: 0.4
   max_tokens: 800
   fallback_provider: claude    # if primary fails
@@ -799,7 +799,7 @@ I read subagent results, integrate them, run end-of-phase verification myself, a
 - `/teach` Telegram command + `scripts/apply_corrections.py` for live user-driven updates (§6.9)
 - `eval_dialect.py` produces a scorecard CSV
 - ADR-0005 (dialect strategy)
-- **Gate:** golden set passes at ≥90% on `gemini-1.5-flash`; scorecard CSV committed; A/B report **(Flash vs Pro within Gemini family)** committed to `docs/dialect_strategy.md`; `/teach` command demonstrably extends the lexicon and phrase library end-to-end
+- **Gate:** golden set passes at ≥90% on `gemini-2.5-flash`; scorecard CSV committed; A/B report **(Flash vs Pro within Gemini family)** committed to `docs/dialect_strategy.md`; `/teach` command demonstrably extends the lexicon and phrase library end-to-end
 
 ### Phase P5 — Security & Safety
 - Injection guard (input + KB ingest)
