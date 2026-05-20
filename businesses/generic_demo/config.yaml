@@ -1,0 +1,83 @@
+# Generic demo business — minimal-but-valid sample matching engine.config.schema.
+# Edit freely; the engine never imports from businesses/.
+
+business:
+  id: generic_demo
+  display_name: "شركة الواحة للخدمات"
+  industry: general_services
+  language: ar-OM
+  timezone: Asia/Muscat
+  contact:
+    phone: "+968 24 000 000"
+    email: info@example.om
+    address: "مسقط، عمان"
+  hours:
+    sunday:    [{ open: "08:00", close: "17:00" }]
+    monday:    [{ open: "08:00", close: "17:00" }]
+    tuesday:   [{ open: "08:00", close: "17:00" }]
+    wednesday: [{ open: "08:00", close: "17:00" }]
+    thursday:  [{ open: "08:00", close: "17:00" }]
+    friday:    []
+    saturday:  [{ open: "08:00", close: "13:00" }]
+
+persona:
+  name: "سارة"
+  role: "موظفة استقبال"
+  voice: "محترمة، رسمية، خدومة، صبورة، واضحة"
+  formality: high
+  region: muscat
+  address: plural_respect_default
+  response_style:
+    length: adaptive
+    max_words_casual: 40
+    max_words_detailed: 150
+    one_question_per_turn: true
+  signature_close: "تحت أمركم، أي خدمة ثانية؟"
+
+llm:
+  provider: gemini
+  model: gemini-1.5-flash
+  temperature: 0.4
+  max_tokens: 800
+
+embedding:
+  provider: gemini
+  model: text-embedding-004
+
+rag:
+  top_k: 5
+  rerank: false
+  chunk_size_tokens: 400
+  chunk_overlap_tokens: 60
+
+dialect:
+  enforce: true
+  threshold: 70
+  use_judge: false
+  max_corrections: 2
+  banned_token_extras: []
+
+memory:
+  short_term_turns: 12
+  long_term_enabled: true
+  summarize_after_turns: 16
+
+channels:
+  telegram:
+    enabled: true
+    bot_token_env: TELEGRAM_BOT_TOKEN
+    allowed_chat_ids: []
+    escalation_chat_id_env: TELEGRAM_ESCALATION_CHAT_ID
+    admin_chat_ids: [880315854]
+
+security:
+  rate_limit:
+    per_chat_burst: 5
+    per_chat_sustained_per_min: 20
+    per_business_daily_token_cap: 5000000
+  pii_consent: false
+  allow_languages: ["ar"]
+
+observability:
+  log_level: INFO
+  trace_exporter: none

@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Architecture & methodology
+    url: https://github.com/basilalshukaili/omani-reception/blob/main/PLAN.md
+    about: The full plan, including risks and acceptance criteria
+  - name: Phase reports
+    url: https://github.com/basilalshukaili/omani-reception/tree/main/docs/phase_reports
+    about: What was built in each phase, with demo evidence
