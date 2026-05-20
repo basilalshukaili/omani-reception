@@ -1,0 +1,20 @@
+# Normalize line endings — Windows + Linux mixed team
+* text=auto eol=lf
+
+# Force LF for shell scripts (executed on Linux containers)
+*.sh   text eol=lf
+*.bash text eol=lf
+
+# Force CRLF for Windows batch files
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Treat as binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.zip binary
+*.gz binary

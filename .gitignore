@@ -1,0 +1,65 @@
+# Secrets — never commit
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+secrets/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.tox/
+.hypothesis/
+*.egg-info/
+dist/
+build/
+pip-wheel-metadata/
+
+# uv
+.uv-cache/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Local data
+data/
+*.sqlite
+*.sqlite3
+*.db
+
+# Docker
+.docker/
+docker-volumes/
+
+# Node (in case any tooling appears later)
+node_modules/
+
+# OS
+.fuse_hidden*
+.directory
+.Trash-*
+
+# Project-specific
+docs/phase_reports/*.draft.md   # draft phase reports — only commit when finalized
