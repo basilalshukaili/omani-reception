@@ -1,0 +1,88 @@
+# Omani Reception — Docker Compose
+# Three-service P0 stack: Postgres+pgvector, Redis, app container.
+# Compose v2 spec (no `version:` key).
+
+services:
+
+  # ---------- Postgres + pgvector ----------
+  postgres:
+    image: 'pgvector/pgvector:pg16'
+    container_name: 'reception_postgres'
+    restart: 'unless-stopped'
+    environment:
+      POSTGRES_DB: '${POSTGRES_DB:-reception}'
+      POSTGRES_USER: '${POSTGRES_USER:-reception}'
+      POSTGRES_PASSWORD: '${POSTGRES_PASSWORD:-change-me-in-real-env}'
+    ports:
+      - '5432:5432'
+    volumes:
+      - 'postgres_data:/var/lib/postgresql/data'
+      # init.sql runs only on first boot (empty data dir)
+      - './infra/postgres/init.sql:/docker-entrypoint-initdb.d/00-init.sql:ro'
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U $${POSTGRES_USER:-reception} -d $${POSTGRES_DB:-reception}']
+      interval: '5s'
+      timeout: '5s'
+      retries: 10
+      start_period: '10s'
+
+  # ---------- Redis ----------
+  redis:
+    image: 'redis:7-alpine'
+    container_name: 'reception_redis'
+    restart: 'unless-stopped'
+    # Use the REDIS_PASSWORD env var only if non-empty; otherwise run without auth.
+    command: >
+      sh -c '
+      if [ -n "$$REDIS_PASSWORD" ]; then
+        exec redis-server --requirepass "$$REDIS_PASSWORD" --appendonly yes;
+      else
+        exec redis-server --appendonly yes;
+      fi
+      '
+    environment:
+      REDIS_PASSWORD: '${REDIS_PASSWORD:-}'
+    ports:
+      - '6379:6379'
+    volumes:
+      - 'redis_data:/data'
+    healthcheck:
+      # Use -a only if a password is set; redis-cli accepts empty auth gracefully.
+      test:
+        - 'CMD-SHELL'
+        - 'if [ -n "$$REDIS_PASSWORD" ]; then redis-cli -a "$$REDIS_PASSWORD" ping | grep -q PONG; else redis-cli ping | grep -q PONG; fi'
+      interval: '5s'
+      timeout: '5s'
+      retries: 10
+      start_period: '5s'
+
+  # ---------- App (Reception engine) ----------
+  app:
+    build:
+      context: '.'
+      dockerfile: 'infra/docker/Dockerfile'
+    container_name: 'reception_app'
+    # `no` so health-check failures surface immediately during P0 bring-up.
+    restart: 'no'
+    env_file:
+      - '.env'
+    depends_on:
+      postgres:
+        condition: 'service_healthy'
+      redis:
+        condition: 'service_healthy'
+    # Dev bind-mount: uncomment the volume below to live-edit code from the host.
+    # volumes:
+    #   - './:/app'
+    # P0 default: run a health check, then idle so the container stays up for
+    # `docker exec` debugging. Telegram polling is wired up in P1.
+    command: >
+      sh -c '
+      python -m engine.cli health &&
+      echo "[reception] health check passed — idling for docker exec debugging" &&
+      sleep infinity
+      '
+
+volumes:
+  postgres_data:
+  redis_data:

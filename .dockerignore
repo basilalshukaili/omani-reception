@@ -1,0 +1,53 @@
+# Source-only build context — keep image small and don't leak local state
+
+# Git
+.git/
+.gitignore
+.gitattributes
+.github/
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# Python local state
+__pycache__/
+*.py[cod]
+*.so
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.tox/
+.hypothesis/
+*.egg-info/
+dist/
+build/
+.uv-cache/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+
+# Docs that don't belong in the image
+docs/
+*.md
+!README.md
+PLAN.md
+
+# Local data / scratch
+data/
+logs/
+*.log
+*.sqlite*
+docker-volumes/
+
+# Tests don't need to be in the runtime image (but kept for the test stage)
+# tests/  # leave in — used by the "test" target
